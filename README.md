@@ -8,5 +8,5 @@
 ## Installation
 
 ```
-Install-Package Soenneker.Blob.Sas
+dotnet add package Soenneker.Blob.Sas
 ```
