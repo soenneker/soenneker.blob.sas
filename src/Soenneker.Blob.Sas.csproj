@@ -40,7 +40,7 @@
 
         
 
-        <PackageReference Include="Soenneker.Blob.Client" Version="2.1.420" />
+        <PackageReference Include="Soenneker.Blob.Client" Version="2.1.422" />
 
         <PackageReference Include="Soenneker.Enums.DeployEnvironment" Version="2.1.122" />
     </ItemGroup>
