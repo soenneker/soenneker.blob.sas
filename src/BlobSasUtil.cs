@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Azure.Storage;
 using Azure.Storage.Blobs;
@@ -9,6 +8,9 @@ using Microsoft.Extensions.Logging;
 using Soenneker.Blob.Client.Abstract;
 using Soenneker.Blob.Sas.Abstract;
 using Soenneker.Enums.DeployEnvironment;
+using Soenneker.Extensions.Configuration;
+using Soenneker.Extensions.DateTime;
+using Soenneker.Extensions.ValueTask;
 
 namespace Soenneker.Blob.Sas;
 
@@ -22,27 +24,28 @@ public class BlobSasUtil : IBlobSasUtil
     private readonly string _accountName;
     private readonly string _accountKey;
 
+    private readonly Lazy<StorageSharedKeyCredential> _credential;
+
     public BlobSasUtil(IConfiguration config, IBlobClientUtil clientUtil, ILogger<BlobSasUtil> logger)
     {
-        IConfiguration config1 = config;
         _clientUtil = clientUtil;
         _logger = logger;
-        _environment = config.GetValue<string>("Environment")!;
-        _accountName = config1.GetValue<string>("Azure:Storage:Blob:AccountName")!;
-        _accountKey = config1.GetValue<string>("Azure:Storage:Blob:AccountKey")!;
+        _environment = config.GetValueStrict<string>("Environment");
+        _accountName = config.GetValueStrict<string>("Azure:Storage:Blob:AccountName");
+        _accountKey = config.GetValueStrict<string>("Azure:Storage:Blob:AccountKey");
+
+        _credential = new Lazy<StorageSharedKeyCredential>(() => new StorageSharedKeyCredential(_accountName, _accountKey), true);
     }
 
     public string GetSasUri(string containerName, string relativeUrl)
     {
         BlobSasBuilder sas = GetBlobBuilder(containerName, relativeUrl);
 
-        var credential = new StorageSharedKeyCredential(_accountName, _accountKey);
-
         string baseUrl = GetBlobUri(containerName, relativeUrl);
 
         var sasUri = new UriBuilder(baseUrl)
         {
-            Query = sas.ToSasQueryParameters(credential).ToString()
+            Query = sas.ToSasQueryParameters(_credential.Value).ToString()
         };
 
         var uri = sasUri.ToString();
@@ -63,7 +66,7 @@ public class BlobSasUtil : IBlobSasUtil
 
     public async ValueTask<string?> GetSasUriWithClient(string containerName, string relativeUrl)
     {
-        BlobClient client = await _clientUtil.GetClient(containerName, relativeUrl);
+        BlobClient client = await _clientUtil.Get(containerName, relativeUrl).NoSync();
 
         if (client.CanGenerateSasUri)
         {
@@ -78,7 +81,7 @@ public class BlobSasUtil : IBlobSasUtil
             return result;
         }
 
-        _logger.LogError(@"BlobContainerClient must be authorized with Shared Key credentials to create a service SAS.");
+        _logger.LogError("BlobContainerClient must be authorized with Shared Key credentials to create a service SAS.");
 
         return null;
     }
@@ -87,15 +90,15 @@ public class BlobSasUtil : IBlobSasUtil
     {
         DateTime utcNow = DateTime.UtcNow;
 
-        DateTimeOffset expiresOn = ToDateTimeOffset(utcNow.AddMonths(1));
-        DateTimeOffset startsOn = ToDateTimeOffset(utcNow.AddMinutes(-5));
+        var startsOn = utcNow.AddMinutes(-5).ToDateTimeOffset();
+        var expiresOn = utcNow.AddMonths(1).ToDateTimeOffset();
 
         var sas = new BlobSasBuilder
         {
             BlobContainerName = containerName,
             BlobName = relativeUrl,
-            ExpiresOn = expiresOn,
             StartsOn = startsOn,
+            ExpiresOn = expiresOn,
             Resource = "b" //b = blob, c = container,
         };
 
@@ -107,18 +110,17 @@ public class BlobSasUtil : IBlobSasUtil
         return sas;
     }
 
-    [Pure]
-    public static DateTimeOffset ToDateTimeOffset(DateTime dateTime)
-    {
-        return new DateTimeOffset(dateTime);
-    }
-
     public Uri GetAccountSasUri(Uri storageUri)
     {
+        DateTime utcNow = DateTime.UtcNow;
+
+        var startsOn = utcNow.AddMinutes(-5).ToDateTimeOffset();
+        var expiresOn = utcNow.AddHours(1).ToDateTimeOffset();
+
         var sas = new AccountSasBuilder
         {
-            ExpiresOn = DateTimeOffset.UtcNow.AddHours(1), // Access expires in 1 hour! May want to change this
-            StartsOn = DateTimeOffset.UtcNow.AddMinutes(-5),
+            StartsOn = startsOn,
+            ExpiresOn = expiresOn, // Access expires in 1 hour! May want to change this
             ResourceTypes = AccountSasResourceTypes.All,
             Protocol = SasProtocol.Https,
             Services = AccountSasServices.Blobs
