@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Soenneker.Blob.Sas.Abstract;
@@ -21,5 +22,5 @@ public interface IBlobSasUtil
     Uri GetAccountSasUri(Uri storageUri);
 
     [Pure]
-    ValueTask<string?> GetSasUriWithClient(string containerName, string relativeUrl);
+    ValueTask<string?> GetSasUriWithClient(string containerName, string relativeUrl, CancellationToken cancellationToken = default);
 }

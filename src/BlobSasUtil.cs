@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage;
 using Azure.Storage.Blobs;
@@ -64,9 +65,9 @@ public class BlobSasUtil : IBlobSasUtil
         return $"{storageUri}{container}/{relativeUri}";
     }
 
-    public async ValueTask<string?> GetSasUriWithClient(string containerName, string relativeUrl)
+    public async ValueTask<string?> GetSasUriWithClient(string containerName, string relativeUrl, CancellationToken cancellationToken = default)
     {
-        BlobClient client = await _clientUtil.Get(containerName, relativeUrl).NoSync();
+        BlobClient client = await _clientUtil.Get(containerName, relativeUrl, cancellationToken: cancellationToken).NoSync();
 
         if (client.CanGenerateSasUri)
         {
