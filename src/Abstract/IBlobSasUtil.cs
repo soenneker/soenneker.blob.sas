@@ -13,6 +13,9 @@ namespace Soenneker.Blob.Sas.Abstract;
 public interface IBlobSasUtil
 {
     [Pure]
+    string GetBlobUri(string container, string relativeUri);
+
+    [Pure]
     string GetSasUri(string containerName, string relativeUrl);
 
     /// <summary>
