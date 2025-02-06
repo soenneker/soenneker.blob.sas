@@ -10,18 +10,22 @@ namespace Soenneker.Blob.Sas.Registrars;
 /// </summary>
 public static class BlobSasUtilRegistrar
 {
-    public static void AddBlobSasUtilAsSingleton(this IServiceCollection services)
+    public static IServiceCollection AddBlobSasUtilAsSingleton(this IServiceCollection services)
     {
         services.AddBlobClientUtilAsSingleton();
         services.TryAddSingleton<IBlobSasUtil, BlobSasUtil>();
+
+        return services;
     }
 
     /// <summary>
     /// Recommended
     /// </summary>
-    public static void AddBlobSasUtilAsScoped(this IServiceCollection services)
+    public static IServiceCollection AddBlobSasUtilAsScoped(this IServiceCollection services)
     {
         services.AddBlobClientUtilAsScoped();
         services.TryAddScoped<IBlobSasUtil, BlobSasUtil>();
+
+        return services;
     }
 }
