@@ -12,8 +12,8 @@ public static class BlobSasUtilRegistrar
 {
     public static IServiceCollection AddBlobSasUtilAsSingleton(this IServiceCollection services)
     {
-        services.AddBlobClientUtilAsSingleton();
-        services.TryAddSingleton<IBlobSasUtil, BlobSasUtil>();
+        services.AddBlobClientUtilAsSingleton()
+                .TryAddSingleton<IBlobSasUtil, BlobSasUtil>();
 
         return services;
     }
@@ -23,8 +23,8 @@ public static class BlobSasUtilRegistrar
     /// </summary>
     public static IServiceCollection AddBlobSasUtilAsScoped(this IServiceCollection services)
     {
-        services.AddBlobClientUtilAsScoped();
-        services.TryAddScoped<IBlobSasUtil, BlobSasUtil>();
+        services.AddBlobClientUtilAsScoped()
+                .TryAddScoped<IBlobSasUtil, BlobSasUtil>();
 
         return services;
     }
