@@ -38,6 +38,6 @@
         <None Include="..\icon.png" Pack="true" PackagePath="\" />
         <PackageReference Include="Soenneker.Blob.Client" Version="3.0.1627" />
         <PackageReference Include="Soenneker.Enums.DeployEnvironment" Version="3.0.166" />
-        <PackageReference Include="Soenneker.Extensions.DateTime" Version="3.0.1508" />
+        <PackageReference Include="Soenneker.Extensions.DateTime" Version="3.0.1509" />
     </ItemGroup>
 </Project>
