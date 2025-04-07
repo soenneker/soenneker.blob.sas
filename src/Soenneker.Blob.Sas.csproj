@@ -36,7 +36,7 @@
         <None Include="..\README.md" Pack="true" PackagePath="\" />
         <None Include="..\LICENSE" Pack="true" PackagePath="\" />
         <None Include="..\icon.png" Pack="true" PackagePath="\" />
-        <PackageReference Include="Soenneker.Blob.Client" Version="3.0.1758" />
+        <PackageReference Include="Soenneker.Blob.Client" Version="3.0.1760" />
         <PackageReference Include="Soenneker.Enums.DeployEnvironment" Version="3.0.169" />
         <PackageReference Include="Soenneker.Extensions.DateTime" Version="3.0.1624" />
     </ItemGroup>
