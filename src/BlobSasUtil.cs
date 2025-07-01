@@ -16,7 +16,7 @@ using Soenneker.Extensions.ValueTask;
 namespace Soenneker.Blob.Sas;
 
 ///<inheritdoc cref="IBlobSasUtil"/>
-public class BlobSasUtil : IBlobSasUtil
+public sealed class BlobSasUtil : IBlobSasUtil
 {
     private readonly IBlobClientUtil _clientUtil;
     private readonly ILogger<BlobSasUtil> _logger;
@@ -49,8 +49,7 @@ public class BlobSasUtil : IBlobSasUtil
             Query = sas.ToSasQueryParameters(_credential.Value).ToString()
         };
 
-        var uri = sasUri.ToString();
-        return uri;
+        return sasUri.ToString();
     }
 
     public string GetBlobUri(string container, string relativeUri)
