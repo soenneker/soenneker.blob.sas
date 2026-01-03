@@ -88,10 +88,10 @@ public sealed class BlobSasUtil : IBlobSasUtil
 
     private BlobSasBuilder GetBlobBuilder(string containerName, string relativeUrl)
     {
-        DateTime utcNow = DateTime.UtcNow;
+        DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
-        var startsOn = utcNow.AddMinutes(-5).ToDateTimeOffset();
-        var expiresOn = utcNow.AddMonths(1).ToDateTimeOffset();
+        var startsOn = utcNow.AddMinutes(-5);
+        var expiresOn = utcNow.AddMonths(1);
 
         var sas = new BlobSasBuilder
         {
@@ -112,10 +112,10 @@ public sealed class BlobSasUtil : IBlobSasUtil
 
     public Uri GetAccountSasUri(Uri storageUri)
     {
-        DateTime utcNow = DateTime.UtcNow;
+        DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
-        var startsOn = utcNow.AddMinutes(-5).ToDateTimeOffset();
-        var expiresOn = utcNow.AddHours(1).ToDateTimeOffset();
+        var startsOn = utcNow.AddMinutes(-5);
+        var expiresOn = utcNow.AddHours(1);
 
         var sas = new AccountSasBuilder
         {
