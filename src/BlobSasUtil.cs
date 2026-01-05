@@ -10,7 +10,6 @@ using Soenneker.Blob.Client.Abstract;
 using Soenneker.Blob.Sas.Abstract;
 using Soenneker.Enums.DeployEnvironment;
 using Soenneker.Extensions.Configuration;
-using Soenneker.Extensions.DateTime;
 using Soenneker.Extensions.ValueTask;
 
 namespace Soenneker.Blob.Sas;
@@ -46,7 +45,8 @@ public sealed class BlobSasUtil : IBlobSasUtil
 
         var sasUri = new UriBuilder(baseUrl)
         {
-            Query = sas.ToSasQueryParameters(_credential.Value).ToString()
+            Query = sas.ToSasQueryParameters(_credential.Value)
+                       .ToString()
         };
 
         return sasUri.ToString();
@@ -66,7 +66,8 @@ public sealed class BlobSasUtil : IBlobSasUtil
 
     public async ValueTask<string?> GetSasUriWithClient(string containerName, string relativeUrl, CancellationToken cancellationToken = default)
     {
-        BlobClient client = await _clientUtil.Get(containerName, relativeUrl, cancellationToken: cancellationToken).NoSync();
+        BlobClient client = await _clientUtil.Get(containerName, relativeUrl, cancellationToken: cancellationToken)
+                                             .NoSync();
 
         if (client.CanGenerateSasUri)
         {
@@ -90,8 +91,8 @@ public sealed class BlobSasUtil : IBlobSasUtil
     {
         DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
-        var startsOn = utcNow.AddMinutes(-5);
-        var expiresOn = utcNow.AddMonths(1);
+        DateTimeOffset startsOn = utcNow.AddMinutes(-5);
+        DateTimeOffset expiresOn = utcNow.AddMonths(1);
 
         var sas = new BlobSasBuilder
         {
@@ -114,8 +115,8 @@ public sealed class BlobSasUtil : IBlobSasUtil
     {
         DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
-        var startsOn = utcNow.AddMinutes(-5);
-        var expiresOn = utcNow.AddHours(1);
+        DateTimeOffset startsOn = utcNow.AddMinutes(-5);
+        DateTimeOffset expiresOn = utcNow.AddHours(1);
 
         var sas = new AccountSasBuilder
         {
@@ -132,7 +133,8 @@ public sealed class BlobSasUtil : IBlobSasUtil
 
         var sasUri = new UriBuilder(storageUri.AbsoluteUri.TrimEnd('/'))
         {
-            Query = sas.ToSasQueryParameters(credential).ToString()
+            Query = sas.ToSasQueryParameters(credential)
+                       .ToString()
         };
 
         return sasUri.Uri;
