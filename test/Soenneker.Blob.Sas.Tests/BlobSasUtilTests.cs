@@ -1,21 +1,19 @@
 using Soenneker.Blob.Sas.Abstract;
-using Soenneker.Tests.FixturedUnit;
-using Xunit;
-
+using Soenneker.Tests.HostedUnit;
 
 namespace Soenneker.Blob.Sas.Tests;
 
-[Collection("Collection")]
-public class BlobSasUtilTests : FixturedUnitTest
+[ClassDataSource<Host>(Shared = SharedType.PerTestSession)]
+public class BlobSasUtilTests : HostedUnitTest
 {
     private readonly IBlobSasUtil _util;
 
-    public BlobSasUtilTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
+    public BlobSasUtilTests(Host host) : base(host)
     {
         _util = Resolve<IBlobSasUtil>(true);
     }
 
-    [Fact]
+    [Test]
     public void Default()
     {
 
