@@ -10,6 +10,11 @@ namespace Soenneker.Blob.Sas.Registrars;
 /// </summary>
 public static class BlobSasUtilRegistrar
 {
+    /// <summary>
+    /// Adds blob sas util as singleton.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The result of the operation.</returns>
     public static IServiceCollection AddBlobSasUtilAsSingleton(this IServiceCollection services)
     {
         services.AddBlobClientUtilAsSingleton().TryAddSingleton<IBlobSasUtil, BlobSasUtil>();
