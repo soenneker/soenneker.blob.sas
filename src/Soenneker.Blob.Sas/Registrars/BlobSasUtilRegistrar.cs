@@ -11,10 +11,10 @@ namespace Soenneker.Blob.Sas.Registrars;
 public static class BlobSasUtilRegistrar
 {
     /// <summary>
-    /// Adds blob sas util as singleton.
+    /// Registers Blob Sas Util with a singleton lifetime.
     /// </summary>
-    /// <param name="services">The service collection.</param>
-    /// <returns>The result of the operation.</returns>
+    /// <param name="services">Service collection that receives the registration.</param>
+    /// <returns>The same service collection, so additional registrations can be chained.</returns>
     public static IServiceCollection AddBlobSasUtilAsSingleton(this IServiceCollection services)
     {
         services.AddBlobClientUtilAsSingleton().TryAddSingleton<IBlobSasUtil, BlobSasUtil>();
@@ -25,6 +25,8 @@ public static class BlobSasUtilRegistrar
     /// <summary>
     /// Recommended
     /// </summary>
+    /// <param name="services">Service collection that receives the registration.</param>
+    /// <returns>The same service collection, so additional registrations can be chained.</returns>
     public static IServiceCollection AddBlobSasUtilAsScoped(this IServiceCollection services)
     {
         services.AddBlobClientUtilAsScoped().TryAddScoped<IBlobSasUtil, BlobSasUtil>();

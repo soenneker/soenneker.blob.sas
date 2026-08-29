@@ -15,34 +15,36 @@ public interface IBlobSasUtil
     /// <summary>
     /// Gets blob uri.
     /// </summary>
-    /// <param name="container">The container.</param>
-    /// <param name="relativeUri">The relative uri.</param>
-    /// <returns>The result of the operation.</returns>
+    /// <param name="container">Element that will contain the rendered component.</param>
+    /// <param name="relativeUri">Relative URI for the get blob uri operation.</param>
+    /// <returns>The requested text.</returns>
     [Pure]
     string GetBlobUri(string container, string relativeUri);
 
     /// <summary>
     /// Gets sas uri.
     /// </summary>
-    /// <param name="containerName">The container name.</param>
-    /// <param name="relativeUrl">The relative url.</param>
-    /// <returns>The result of the operation.</returns>
+    /// <param name="containerName">Name of the container to target.</param>
+    /// <param name="relativeUrl">URL of the relative to target.</param>
+    /// <returns>The requested text.</returns>
     [Pure]
     string GetSasUri(string containerName, string relativeUrl);
 
     /// <summary>
     /// Only should be used for internal usage
     /// </summary>
+    /// <param name="storageUri">Storage URI for the get account sas uri operation.</param>
+    /// <returns>The resulting URI.</returns>
     [Pure]
     Uri GetAccountSasUri(Uri storageUri);
 
     /// <summary>
     /// Gets sas uri with client.
     /// </summary>
-    /// <param name="containerName">The container name.</param>
-    /// <param name="relativeUrl">The relative url.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task containing the result of the operation.</returns>
+    /// <param name="containerName">Name of the container to target.</param>
+    /// <param name="relativeUrl">URL of the relative to target.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A task whose result is the text returned by get Sas URI With Client.</returns>
     [Pure]
     ValueTask<string?> GetSasUriWithClient(string containerName, string relativeUrl, CancellationToken cancellationToken = default);
 }
