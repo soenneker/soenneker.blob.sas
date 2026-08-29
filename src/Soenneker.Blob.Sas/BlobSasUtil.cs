@@ -14,7 +14,7 @@ using Soenneker.Extensions.ValueTask;
 
 namespace Soenneker.Blob.Sas;
 
-///<inheritdoc cref="IBlobSasUtil"/>
+/// <inheritdoc cref="IBlobSasUtil"/>
 public sealed class BlobSasUtil : IBlobSasUtil
 {
     private readonly IBlobClientUtil _clientUtil;
