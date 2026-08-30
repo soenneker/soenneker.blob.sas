@@ -54,14 +54,18 @@ public sealed class BlobSasUtil : IBlobSasUtil
 
     public string GetBlobUri(string container, string relativeUri)
     {
-        string storageUri;
+        Uri storageUri;
 
         if (_environment == DeployEnvironment.Local.Name)
-            storageUri = "http://127.0.0.1:10000/devstoreaccount1/";
+            storageUri = new Uri("http://127.0.0.1:10000/devstoreaccount1/");
         else
-            storageUri = $"https://{_accountName}.blob.core.windows.net/";
+            storageUri = new Uri($"https://{_accountName}.blob.core.windows.net/");
 
-        return $"{storageUri}{container}/{relativeUri}";
+        var serviceClient = new BlobServiceClient(storageUri);
+
+        return serviceClient.GetBlobContainerClient(container)
+                            .GetBlobClient(relativeUri)
+                            .Uri.ToString();
     }
 
     public async ValueTask<string?> GetSasUriWithClient(string containerName, string relativeUrl, CancellationToken cancellationToken = default)
@@ -75,14 +79,12 @@ public sealed class BlobSasUtil : IBlobSasUtil
 
             Uri sasUri = client.GenerateSasUri(sasBuilder);
 
-            var result = sasUri.ToString();
+            _logger.LogDebug("Generated a SAS URI for blob {blob}", client.Uri.GetLeftPart(UriPartial.Path));
 
-            _logger.LogDebug("SAS URI for blob is: {uri}", result);
-
-            return result;
+            return sasUri.ToString();
         }
 
-        _logger.LogError("BlobContainerClient must be authorized with Shared Key credentials to create a service SAS.");
+        _logger.LogError("BlobClient must be authorized with Shared Key credentials to create a service SAS.");
 
         return null;
     }
@@ -122,12 +124,12 @@ public sealed class BlobSasUtil : IBlobSasUtil
         {
             StartsOn = startsOn,
             ExpiresOn = expiresOn, // Access expires in 1 hour! May want to change this
-            ResourceTypes = AccountSasResourceTypes.All,
+            ResourceTypes = AccountSasResourceTypes.Container | AccountSasResourceTypes.Object,
             Protocol = SasProtocol.Https,
             Services = AccountSasServices.Blobs
         };
 
-        sas.SetPermissions(AccountSasPermissions.All);
+        sas.SetPermissions(AccountSasPermissions.Read | AccountSasPermissions.List);
 
         var credential = new StorageSharedKeyCredential(_accountName, _accountKey);
 

@@ -1,50 +1,43 @@
-﻿using System;
-using System.Diagnostics.Contracts;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Soenneker.Blob.Sas.Abstract;
 
 /// <summary>
-/// A utility library for Azure Blob SAS operations <para/>
-/// For *publicly* accessible resources this util returns URLs with tokens attached to them. <para/>
-/// Typically Scoped IoC.
+/// Builds Azure Blob Storage URLs and read-only shared access signatures.
 /// </summary>
 public interface IBlobSasUtil
 {
     /// <summary>
-    /// Gets blob uri.
+    /// Builds the unsigned URL for a blob.
     /// </summary>
-    /// <param name="container">Element that will contain the rendered component.</param>
-    /// <param name="relativeUri">Relative URI for the get blob uri operation.</param>
-    /// <returns>The requested text.</returns>
-    [Pure]
+    /// <param name="container">Name of the blob container.</param>
+    /// <param name="relativeUri">Path of the blob within the container.</param>
+    /// <returns>The absolute blob URL.</returns>
     string GetBlobUri(string container, string relativeUri);
 
     /// <summary>
-    /// Gets sas uri.
+    /// Builds a read-only service SAS URL for a blob using the configured account key.
     /// </summary>
-    /// <param name="containerName">Name of the container to target.</param>
-    /// <param name="relativeUrl">URL of the relative to target.</param>
-    /// <returns>The requested text.</returns>
-    [Pure]
+    /// <param name="containerName">Name of the blob container.</param>
+    /// <param name="relativeUrl">Path of the blob within the container.</param>
+    /// <returns>A signed blob URL that expires after one month.</returns>
     string GetSasUri(string containerName, string relativeUrl);
 
     /// <summary>
-    /// Only should be used for internal usage
+    /// Adds a one-hour, read/list account SAS to a storage service URI.
     /// </summary>
-    /// <param name="storageUri">Storage URI for the get account sas uri operation.</param>
-    /// <returns>The resulting URI.</returns>
-    [Pure]
+    /// <param name="storageUri">Azure Blob Storage service URI to sign.</param>
+    /// <returns>The service URI with an account SAS query string.</returns>
     Uri GetAccountSasUri(Uri storageUri);
 
     /// <summary>
-    /// Gets sas uri with client.
+    /// Builds a read-only service SAS URL through the configured blob client.
     /// </summary>
-    /// <param name="containerName">Name of the container to target.</param>
-    /// <param name="relativeUrl">URL of the relative to target.</param>
-    /// <param name="cancellationToken">Token used to cancel the operation.</param>
-    /// <returns>A task whose result is the text returned by get Sas URI With Client.</returns>
-    [Pure]
+    /// <param name="containerName">Name of the blob container.</param>
+    /// <param name="relativeUrl">Path of the blob within the container.</param>
+    /// <param name="cancellationToken">Token used to cancel client creation.</param>
+    /// <returns>A signed blob URL, or <see langword="null"/> when the client cannot generate a SAS.</returns>
     ValueTask<string?> GetSasUriWithClient(string containerName, string relativeUrl, CancellationToken cancellationToken = default);
 }
