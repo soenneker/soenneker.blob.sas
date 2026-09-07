@@ -25,6 +25,7 @@ public sealed class BlobSasUtil : IBlobSasUtil
     private readonly string _accountKey;
 
     private readonly Lazy<StorageSharedKeyCredential> _credential;
+    private readonly Lazy<BlobServiceClient> _uriClient;
 
     public BlobSasUtil(IConfiguration config, IBlobClientUtil clientUtil, ILogger<BlobSasUtil> logger)
     {
@@ -35,6 +36,7 @@ public sealed class BlobSasUtil : IBlobSasUtil
         _accountKey = config.GetValueStrict<string>("Azure:Storage:Blob:AccountKey");
 
         _credential = new Lazy<StorageSharedKeyCredential>(() => new StorageSharedKeyCredential(_accountName, _accountKey), true);
+        _uriClient = new Lazy<BlobServiceClient>(CreateUriClient, true);
     }
 
     public string GetSasUri(string containerName, string relativeUrl)
@@ -54,18 +56,18 @@ public sealed class BlobSasUtil : IBlobSasUtil
 
     public string GetBlobUri(string container, string relativeUri)
     {
-        Uri storageUri;
+        return _uriClient.Value.GetBlobContainerClient(container)
+                         .GetBlobClient(relativeUri)
+                         .Uri.ToString();
+    }
 
-        if (_environment == DeployEnvironment.Local.Name)
-            storageUri = new Uri("http://127.0.0.1:10000/devstoreaccount1/");
-        else
-            storageUri = new Uri($"https://{_accountName}.blob.core.windows.net/");
+    private BlobServiceClient CreateUriClient()
+    {
+        Uri storageUri = _environment == DeployEnvironment.Local.Name
+            ? new Uri("http://127.0.0.1:10000/devstoreaccount1/")
+            : new Uri($"https://{_accountName}.blob.core.windows.net/");
 
-        var serviceClient = new BlobServiceClient(storageUri);
-
-        return serviceClient.GetBlobContainerClient(container)
-                            .GetBlobClient(relativeUri)
-                            .Uri.ToString();
+        return new BlobServiceClient(storageUri);
     }
 
     public async ValueTask<string?> GetSasUriWithClient(string containerName, string relativeUrl, CancellationToken cancellationToken = default)
@@ -131,11 +133,10 @@ public sealed class BlobSasUtil : IBlobSasUtil
 
         sas.SetPermissions(AccountSasPermissions.Read | AccountSasPermissions.List);
 
-        var credential = new StorageSharedKeyCredential(_accountName, _accountKey);
 
         var sasUri = new UriBuilder(storageUri.AbsoluteUri.TrimEnd('/'))
         {
-            Query = sas.ToSasQueryParameters(credential)
+            Query = sas.ToSasQueryParameters(_credential.Value)
                        .ToString()
         };
 
