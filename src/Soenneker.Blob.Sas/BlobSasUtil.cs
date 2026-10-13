@@ -31,9 +31,9 @@ public sealed class BlobSasUtil : IBlobSasUtil
     {
         _clientUtil = clientUtil;
         _logger = logger;
-        _environment = config.GetValueStrict<string>("Environment");
-        _accountName = config.GetValueStrict<string>("Azure:Storage:Blob:AccountName");
-        _accountKey = config.GetValueStrict<string>("Azure:Storage:Blob:AccountKey");
+        _environment = config.GetStringStrict("Environment");
+        _accountName = config.GetStringStrict("Azure:Storage:Blob:AccountName");
+        _accountKey = config.GetStringStrict("Azure:Storage:Blob:AccountKey");
 
         _credential = new Lazy<StorageSharedKeyCredential>(() => new StorageSharedKeyCredential(_accountName, _accountKey), true);
         _uriClient = new Lazy<BlobServiceClient>(CreateUriClient, true);
